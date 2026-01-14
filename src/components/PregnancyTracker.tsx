@@ -1,13 +1,15 @@
-import { useState } from "react";
 import { Baby, Calendar, Heart } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { format } from "date-fns";
 
 interface PregnancyTrackerProps {
   currentWeek: number;
-  dueDate: string;
+  daysUntilDue: number;
+  dueDate: Date | null;
+  babyName?: string | null;
 }
 
-const PregnancyTracker = ({ currentWeek, dueDate }: PregnancyTrackerProps) => {
+const PregnancyTracker = ({ currentWeek, daysUntilDue, dueDate, babyName }: PregnancyTrackerProps) => {
   const trimester = currentWeek <= 12 ? 1 : currentWeek <= 27 ? 2 : 3;
   const progress = (currentWeek / 40) * 100;
   
@@ -41,6 +43,8 @@ const PregnancyTracker = ({ currentWeek, dueDate }: PregnancyTrackerProps) => {
       Math.abs(curr - currentWeek) < Math.abs(prev - currentWeek) ? curr : prev
     );
 
+  const displayName = babyName || "Baby";
+
   return (
     <div className="gradient-card rounded-2xl p-6 shadow-card animate-fade-in">
       <div className="flex items-center justify-between mb-6">
@@ -55,7 +59,9 @@ const PregnancyTracker = ({ currentWeek, dueDate }: PregnancyTrackerProps) => {
         </div>
         <div className="text-right">
           <p className="text-sm text-muted-foreground">Due Date</p>
-          <p className="font-semibold text-foreground">{dueDate}</p>
+          <p className="font-semibold text-foreground">
+            {dueDate ? format(dueDate, "MMM d, yyyy") : "Not set"}
+          </p>
         </div>
       </div>
 
@@ -75,7 +81,7 @@ const PregnancyTracker = ({ currentWeek, dueDate }: PregnancyTrackerProps) => {
         <div className="bg-muted/50 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <Heart className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">Baby's Size</span>
+            <span className="text-sm font-medium text-foreground">{displayName}'s Size</span>
           </div>
           <p className="text-lg font-bold text-primary capitalize">
             {babySize[Math.min(currentWeek - 1, babySize.length - 1)]}
@@ -87,7 +93,7 @@ const PregnancyTracker = ({ currentWeek, dueDate }: PregnancyTrackerProps) => {
             <span className="text-sm font-medium text-foreground">Days Left</span>
           </div>
           <p className="text-lg font-bold text-secondary-foreground">
-            {Math.max(0, (40 - currentWeek) * 7)} days
+            {daysUntilDue} days
           </p>
         </div>
       </div>
